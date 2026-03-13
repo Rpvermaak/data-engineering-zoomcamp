@@ -1,63 +1,92 @@
-# Local .terraform directories
-.terraform/
-
-# .tfstate files
-*.tfstate
-*.tfstate.*
-
-# Crash log files
-crash.log
-crash.*.log
-
-# Exclude all .tfvars files, which are likely to contain sensitive data, such as
-# password, private keys, and other secrets. These should not be part of version 
-# control as they are data points which are potentially sensitive and subject 
-# to change depending on the environment.
-*.tfvars
-*.tfvars.json
-
-# Ignore override files as they are usually used to override resources locally and so
-# are not checked in
-override.tf
-override.tf.json
-*_override.tf
-*_override.tf.json
-
-# Ignore transient lock info files created by terraform apply
-.terraform.tfstate.lock.info
-
-# Include override files you do wish to add to version control using negated pattern
-# !example_override.tf
-
-# Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
-# example: *tfplan*
-
-# Ignore CLI configuration files
-.terraformrc
-terraform.rc
-# --- Cloud & Security (CRITICAL) ---
-*.json
+# ==================================
+# Cloud & Security (CRITICAL)
+# ==================================
 *.pem
 *.key
 .env
 secrets.tfvars
 credentials/
+**google_credentials.json
 
-# --- Terraform ---
+# ==================================
+# Terraform
+# ==================================
 .terraform/
-*.tfstate
-*.tfstate.backup
+**.terraform
+**.terraform.lock.*
 .terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+.terraform.tfstate.lock.info
+*.tfvars
+*.tfvars.json
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
 
-# --- Python ---
+# ==================================
+# Python
+# ==================================
 __pycache__/
+**__pycache__/
 *.py[cod]
 *$py.class
 venv/
 .venv/
 env/
 
-# --- Docker & OS ---
+# ==================================
+# Jupyter
+# ==================================
+.ipynb_checkpoints/
+
+# ==================================
+# Data files
+# ==================================
+*.parquet
+*.csv
+*.duckdb
+**/ny_taxi_postgres_data/*
+
+# ==================================
+# Docker & OS
+# ==================================
 .DS_Store
 Thumbs.db
 *.log
+**logs/
+crash.log
+crash.*.log
+serving_dir
+
+# ==================================
+# IDE
+# ==================================
+.idea
+.history
+
+# ==================================
+# Course content (reference only - not tracked)
+# ==================================
+01-docker-terraform/
+02-workflow-orchestration/
+03-data-warehouse/
+04-analytics-engineering/
+05-data-platforms/
+06-batch/
+07-streaming/
+cohorts/
+images/
+projects/
+asking-questions.md
+learning-in-public.md
+
+# ==================================
+# Build artifacts
+# ==================================
+notebooklm_exports/
+build_notebooklm.sh
