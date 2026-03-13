@@ -72,18 +72,18 @@ serving_dir
 # ==================================
 # Course content (reference only - not tracked)
 # ==================================
-01-docker-terraform/
-02-workflow-orchestration/
-03-data-warehouse/
-04-analytics-engineering/
-05-data-platforms/
-06-batch/
-07-streaming/
-cohorts/
-images/
-projects/
-asking-questions.md
-learning-in-public.md
+/01-docker-terraform/
+/02-workflow-orchestration/
+/03-data-warehouse/
+/04-analytics-engineering/
+/05-data-platforms/
+/06-batch/
+/07-streaming/
+/cohorts/
+/images/
+/projects/
+/asking-questions.md
+/learning-in-public.md
 
 # ==================================
 # Build artifacts
