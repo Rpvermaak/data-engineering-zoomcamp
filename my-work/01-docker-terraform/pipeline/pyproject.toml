@@ -1,7 +1,7 @@
 [project]
 name = "pipeline"
 version = "0.1.0"
-description = "Add your description here"
+description = "NYC Yellow Taxi data ingestion pipeline — downloads, parses, and loads trip data into PostgreSQL"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [

@@ -1,23 +1,20 @@
-# My Work - Data Engineering Zoomcamp 2026
+# My Work — Data Engineering Zoomcamp 2026
 
-This folder contains my personal work, notes, and code as I go through the
-[Data Engineering Zoomcamp](https://github.com/DataTalksClub/data-engineering-zoomcamp) course.
+All code, notebooks, and notes I've written while completing the [Data Engineering Zoomcamp](https://github.com/DataTalksClub/data-engineering-zoomcamp).
 
-## Structure
+## Modules
 
-```
-my-work/
-├── 01-docker-terraform/   # Module 1: Docker & Terraform
-├── 02-workflow-orchestration/ # Module 2: Workflow Orchestration
-├── 03-data-warehouse/     # Module 3: Data Warehouse (BigQuery)
-├── 04-analytics-engineering/ # Module 4: Analytics Engineering (dbt)
-├── 05-data-platforms/     # Module 5: Data Platforms
-├── 06-batch/              # Module 6: Batch Processing (Spark)
-├── 07-streaming/          # Module 7: Streaming (Kafka)
-└── homework/              # Homework submissions
-```
+| # | Directory | What I Built | Key Skills |
+|---|-----------|-------------|------------|
+| 1 | [`01-docker-terraform/`](01-docker-terraform/) | NYC Taxi data ingestion pipeline | Docker, PostgreSQL, Terraform, Python CLI |
+| 2 | [`02-workflow-orchestration/`](02-workflow-orchestration/) | *Coming soon* | Kestra, DAGs |
+| 3 | [`03-data-warehouse/`](03-data-warehouse/) | *Coming soon* | BigQuery, partitioning |
+| 4 | [`04-analytics-engineering/`](04-analytics-engineering/) | *Coming soon* | dbt, data modeling |
+| 5 | [`05-data-platforms/`](05-data-platforms/) | *Coming soon* | Bruin, end-to-end pipelines |
+| 6 | [`06-batch/`](06-batch/) | *Coming soon* | Apache Spark, PySpark |
+| 7 | [`07-streaming/`](07-streaming/) | *Coming soon* | Kafka, Avro |
+| | [`homework/`](homework/) | Homework submissions | — |
 
-## Course Reference
+## Note on Repository Layout
 
-The full course content is in the root-level module folders (01-docker-terraform/, etc.)
-but is not tracked in git. It's there locally for reference only.
+The root-level module folders (`01-docker-terraform/`, `02-workflow-orchestration/`, etc.) contain the **upstream course materials** from DataTalks.Club. They are kept locally for reference but are excluded from version control via `.gitignore`. Everything under `my-work/` is my own code.
