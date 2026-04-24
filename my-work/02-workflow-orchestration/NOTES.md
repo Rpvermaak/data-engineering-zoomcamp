@@ -79,7 +79,95 @@
 - `pluginDefaults` keeps JDBC credentials DRY across all Postgres tasks
 - Idempotency is a prerequisite for safe backfilling
 
+## Session: April 24, 2026
+
+### GCP ELT Pipelines (Flows 06–09)
+
+#### Flow 06 — GCP KV Setup (`06_gcp_kv.yaml`)
+- Uses Kestra's **Key-Value (KV) store** to hold GCP config without hardcoding it in flows
+- KV pairs set: `GCP_PROJECT_ID`, `GCP_LOCATION`, `GCS_BUCKET_NAME`, `GCP_DATASET`
+- Access in flows with `{{ kv('KEY_NAME') }}`
+- KV store is plain text — don't put credentials there; use **Secrets** instead
+- Secrets: add `SECRET_<KEY>=value` as env vars in Docker Compose; reference in flows as `{{ secret('KEY') }}`
+- GCP service account JSON stored as `SECRET_GCP_CREDS` (base64-encoded in Docker Compose env)
+
+#### Flow 07 — Create GCP Infrastructure (`07_gcp_setup.yaml`)
+- Creates the **GCS bucket** (data lake) and **BigQuery dataset** in one execution
+- Uses `pluginDefaults` for GCP auth: `projectId`, `location`, `serviceAccount` (pulled from secret)
+- Run once during project setup; both resources are create-if-not-exists so it's safe to re-run
+
+#### Flow 08 — GCS + BigQuery ELT Pipeline (`08_gcp_taxi.yaml`)
+- Implements the ELT pattern — load raw data into the cloud first, transform there:
+  1. **Extract**: download CSV from GitHub (same wget as the Postgres pipeline)
+  2. **Load to GCS**: upload raw CSV to the data lake bucket — no transformation yet
+  3. **BigQuery staging**: create staging table, load directly from the GCS URI (`gs://bucket/file.csv`)
+  4. **Transform in BigQuery**: `UPDATE` staging to add MD5 unique row ID + file name
+  5. **MERGE** into final table (`yellow_trip_data` / `green_trip_data`)
+- BigQuery table naming: `project_id.dataset.table_name` (dot notation, not `/`)
+- `skipLeadingRows: 1` in the load config drops the CSV header row
+- `IF` task still splits yellow/green paths (different column schemas)
+- `pluginDefaults` sets GCP project, location, and service account once for all GCP tasks
+- **Performance**: BigQuery processed 7M rows of yellow data in ~35 seconds; the same transform on Postgres took hours on a laptop
+
+#### Flow 09 — Scheduled GCP ELT (`09_gcp_taxi_scheduled.yaml`)
+- Identical to flow 08 with `Schedule` triggers added: green at 09:00, yellow at 10:00, 1st of month
+- `trigger.date | date('yyyy-MM')` derives the correct file from the scheduled fire time — same pattern as Postgres
+- Backfilling works identically: Triggers tab → Backfill executions, date range must cover the trigger's scheduled time
+- End result: 22M+ rows merged for 3 months of yellow data, all in BigQuery
+
+### Key Takeaways
+
+- **GCS = data lake**: cheap, schema-free object storage; **BigQuery = data warehouse**: SQL engine that queries on top
+- ELT is faster than ETL at scale because cloud compute (BigQuery) replaces local Python/SQL transforms
+- BigQuery references GCS directly — raw files stay in the lake, the warehouse just queries over them
+- KV store for non-sensitive config, Secrets for credentials — never mix the two
+- Staging + MERGE is identical in BigQuery as in Postgres — same idempotency guarantees apply
+
+---
+
+## Session: April 24, 2026 (continued)
+
+### AI in Data Engineering (2.5.1–2.5.4)
+
+#### Why AI Matters in Data Engineering (2.5.1)
+- Data engineers spend a lot of time on boilerplate: pipeline scaffolding, documentation, schema definitions
+- AI can accelerate this, but only if it has **context** — without it, output looks correct but is wrong
+- Three modes in Kestra: build-as-code, no-code editor, AI copilot — all interchangeable
+
+#### Context Engineering (2.5.2)
+- **Context engineering**: deliberately providing an AI with docs, examples, and schema so its output is accurate
+- Demonstration: same prompt to vanilla ChatGPT (no context) produced a Kestra flow with invalid task types and missing auth properties — it would fail immediately
+- Key insight: AI is like a new hire who has never seen your stack — give them the docs, don't expect them to guess
+
+#### Kestra AI Copilot (2.5.3)
+- Enable by adding to `KESTRA_CONFIGURATION`:
+  ```yaml
+  ai:
+    type: gemini
+    gemini:
+      model-name: gemini-2.5-flash
+      api-key: "{{ envs.GEMINI_API_KEY }}"
+  ```
+- Get a free Gemini API key from Google AI Studio; export as `GEMINI_API_KEY` env var before starting Docker Compose
+- The copilot is context-aware: it knows your current workflow YAML and Kestra's full plugin library
+- Generate a complete valid flow from a natural language prompt in one shot
+- Iterative: follow-up questions work without re-providing the workflow ("rename the first task to download") — it also updates all references to that task ID automatically
+- Contrast to ChatGPT: copilot produced syntactically valid YAML with correct properties and auth wired up
+
+#### Retrieval Augmented Generation — RAG (2.5.4)
+- **RAG**: ingest documents → create embeddings → store in a vector/embedding store → AI retrieves relevant embeddings at query time instead of relying on training data
+- **Without RAG**: asked AI to list Kestra 1.1 features → confident but hallucinated (listed features that existed for years, not the actual 1.1 highlights)
+- **With RAG**: ingested the Kestra 1.1 release notes as embeddings into the Kestra KV store → same question returned exact, accurate feature list
+- Analogy: RAG is giving the AI a searchable knowledge base, not just its memory
+- In Kestra: use the `ChatCompletion` task with an embedding store reference to enable RAG in a workflow
+
+### Key Takeaways
+
+- AI without context is confidently wrong — always provide docs, examples, or embeddings
+- Kestra's AI copilot has built-in context (plugin library + your current flow); generic LLMs do not
+- RAG closes the gap between "what the model was trained on" and "what is true right now" for your specific stack
+- Use `SECRET_` prefix in Docker Compose for any sensitive value; access with `{{ secret('KEY') }}` in flows
+
 ### Next Up
 
-- GCP pipelines (flows 06–09): GCS and BigQuery
-- AI integration (flows 10–11)
+- Module 03: Data Warehouses (BigQuery deep-dive)
